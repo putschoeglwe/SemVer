@@ -1,21 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace SemVer
 {
     public sealed class Version : IEquatable<Version>, IComparable<Version>
     {
-        public uint Major { get; }
-        public uint Minor { get; }
-        public uint Patch { get; }
-        public Ident[] Prerelease { get; }
-        public Ident[] Build { get; }
-        
-        public string Original { get; }
-
         internal Version(uint major, uint minor, uint patch, Ident[] prerelease, Ident[] build, string original)
         {
             Major = major;
@@ -26,8 +15,16 @@ namespace SemVer
             Original = original;
         }
 
+        public uint Major { get; }
+        public uint Minor { get; }
+        public uint Patch { get; }
+        public Ident[] Prerelease { get; }
+        public Ident[] Build { get; }
 
-        public bool IsPrerelease => this.Prerelease.Any();
+        public string Original { get; }
+
+
+        public bool IsPrerelease => Prerelease.Any();
 
         public int CompareTo(Version other)
         {
@@ -43,6 +40,13 @@ namespace SemVer
             if (!IsPrerelease) return 1;
             if (!other.IsPrerelease) return -1;
             return CompareNonEmptyIdents(Prerelease, other.Prerelease);
+        }
+
+        public bool Equals(Version other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return CompareTo(other) == 0;
         }
 
         public static bool operator <(Version left, Version right)
@@ -68,11 +72,12 @@ namespace SemVer
         private static int CompareNonEmptyIdents(Ident[] first, Ident[] second)
         {
             var min = first.Length < second.Length ? first.Length : second.Length;
-            for (int i = 0; i < min; i++)
+            for (var i = 0; i < min; i++)
             {
                 var r = CompareIdent(first[i], second[i]);
                 if (r != 0) return r;
             }
+
             return first.Length == second.Length ? 0 : first.Length < second.Length ? -1 : 1;
         }
 
@@ -84,7 +89,7 @@ namespace SemVer
                 return -1;
             }
 
-            if (other is Numeric ) return -1;
+            if (other is Numeric) return -1;
             if (ident is AlphaNumeric an1 && other is AlphaNumeric an2)
             {
                 var s1 = an1.Value;
@@ -93,13 +98,6 @@ namespace SemVer
             }
 
             throw new NotImplementedException("Ident must either be Numeric or Alphanumeric, but was something else!");
-        }
-
-        public bool Equals(Version other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return CompareTo(other) == 0; 
         }
 
         public static bool operator ==(Version left, Version right)
@@ -131,27 +129,5 @@ namespace SemVer
                 return hashCode;
             }
         }
-
-    }
-
-    public class Numeric : Ident
-    {
-        public ulong Number { get; }
-
-
-        public Numeric(ulong n)
-        {
-            Number = n;
-        }
-    }
-
-    public class AlphaNumeric : Ident
-    {
-        public AlphaNumeric(string value)
-        {
-            Value = value;
-        }
-
-        public string Value { get; }
     }
 }

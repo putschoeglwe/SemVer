@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace SemVer
@@ -13,6 +10,7 @@ namespace SemVer
             @"^(?<major>0|(?:[1-9][0-9]*))\.(?<minor>0|(?:[1-9][0-9]*))\.(?<patch>0|(?:[1-9][0-9]*))" +
             @"(?:\-(?<prerelease>0|[1-9][0-9]*|[0-9]*[a-zA-Z\-][0-9a-zA-\-]*(?:\.(?:0|[1-9][0-9]*|[0-9]*[a-zA-Z\-][0-9a-zA-Z\-]*))?))?" +
             @"(?:\+(?<build>[0-9a-zA-Z\-]+(?:\.[0-9a-zA-Z\-]+)*))?$";
+
         private static readonly Regex SemverRegex = new Regex(SemverRegexPattern, RegexOptions.Compiled | RegexOptions.Singleline);
 
         public static Version Parse(string input)
@@ -21,14 +19,13 @@ namespace SemVer
             if (!match.Success) throw new ArgumentException($"{input} is not a valid Semantic Version!");
 
             return new Version(
-                match.ParseUint("major"), 
-                match.ParseUint("minor"), 
-                match.ParseUint("patch"), 
+                match.ParseUint("major"),
+                match.ParseUint("minor"),
+                match.ParseUint("patch"),
                 match.ParseIdentList("prerelease"),
                 match.ParseIdentList("build"),
                 input);
         }
-        
     }
 
     public static class MatchExtensions
@@ -44,6 +41,16 @@ namespace SemVer
             return !prereleaseGroup.Success ? new Ident[] { } : prereleaseGroup.Value.ParseIdentList();
         }
 
+        
+    }
+
+    public static class StringExtensions
+    {
+        public static Version ParseSemVer(this string input)
+        {
+            return SemVerParser.Parse(input);
+        }
+
         public static Ident[] ParseIdentList(this string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return new Ident[] { };
@@ -55,14 +62,6 @@ namespace SemVer
         {
             if (uint.TryParse(input, out var n)) return new Numeric(n);
             return new AlphaNumeric(input);
-        }
-    }
-
-    public static class StringExtensions
-    {
-        public static Version ParseSemVer(this string input)
-        {
-            return SemVerParser.Parse(input);
         }
     }
 }

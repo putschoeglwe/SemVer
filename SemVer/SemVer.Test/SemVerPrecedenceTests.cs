@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
+﻿using Xunit;
 
 namespace SemVer.Test
 {
@@ -21,7 +18,7 @@ namespace SemVer.Test
         [Fact]
         public void Given_two_valid_version_with_build_parts_WHEN_comparing_THEN_the_build_part_is_ignored()
         {
-            Assert.True("1.0.0+4".ParseSemVer() == "1.0.0+234".ParseSemVer() );
+            Assert.True("1.0.0+4".ParseSemVer() == "1.0.0+234".ParseSemVer());
         }
     }
 }
