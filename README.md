@@ -10,7 +10,7 @@ Features so far:
 * Version precedence according to spec paragraph 11
 
 ToDos:
-~~1. Version precedence according to spec ~~
+1. ~~Version precedence according to spec ~~
 2. Make a lib with NuGet
 3. make F# wrapper
 4. explain regex used
